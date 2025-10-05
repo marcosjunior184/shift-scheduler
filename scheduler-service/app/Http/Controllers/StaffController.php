@@ -7,6 +7,7 @@ use App\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 
 class StaffController extends Controller
 {
@@ -207,33 +208,6 @@ class StaffController extends Controller
         }
     }
 
-    /**
-     * Get schedules for a specific staff member.
-     */
-    public function schedules($id): JsonResponse
-    {
-        try {
-            $staff = Staff::with('schedules.role')->find($id);
-            
-            if (!$staff) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Staff member not found'
-                ], Response::HTTP_NOT_FOUND);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $staff->schedules
-            ], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve schedules',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 
     /**
      * Terminate a staff member (set end date).

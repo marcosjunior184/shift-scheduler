@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 
 class ScheduleController extends Controller
 {
@@ -140,33 +141,33 @@ class ScheduleController extends Controller
         }
     }
 
-    /**
-     * Get a specified schedule.
-     */
-    public function show($id): JsonResponse
-    {
-        try {
-            $schedule = Schedule::with(['employee.role', 'role'])->find($id);
+    // /**
+    //  * Get a specified schedule.
+    //  */
+    // public function show($id): JsonResponse
+    // {
+    //     try {
+    //         $schedule = Schedule::with(['employee.role', 'role'])->find($id);
             
-            if (!$schedule) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Schedule not found'
-                ], ScheduleResponse::HTTP_NOT_FOUND);
-            }
+    //         if (!$schedule) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Schedule not found'
+    //             ], ScheduleResponse::HTTP_NOT_FOUND);
+    //         }
 
-            return response()->json([
-                'success' => true,
-                'data' => $schedule
-            ], Response::HTTP_OK);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve schedule',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $schedule
+    //         ], Response::HTTP_OK);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to retrieve schedule',
+    //             'error' => $e->getMessage()
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     /**
      * Update the specified schedule.
@@ -280,7 +281,7 @@ class ScheduleController extends Controller
 
     // HELPER METHODS
 
-    private function groupSechedulesByRole ($schedules) : array
+    private function groupSchedulesByRole ($schedules) : array
     {
         $grouped = [];
 
@@ -297,7 +298,7 @@ class ScheduleController extends Controller
             $grouped[$roleName][] = [
                 'id' => $schedule->id,
                 'employee' => $schedule->employee,
-                'role' => $schedule->role,
+                'role' => $schedule->role->role_name,
                 'shift' => $schedule->start_time . ' - ' . $schedule->end_time,
                 'duration' => $schedule->duration . ' hours',
                 'date' => $schedule->date,
@@ -305,5 +306,7 @@ class ScheduleController extends Controller
                 'end_time' => $schedule->end_time,
             ];
         }
+
+        return $grouped;
     }
 }
