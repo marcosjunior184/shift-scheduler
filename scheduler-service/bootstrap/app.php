@@ -23,9 +23,9 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +60,8 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('logging');
+$app->configure('database');
 
 /*
 |--------------------------------------------------------------------------
@@ -72,13 +74,10 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->middleware([
+    App\Http\Middleware\Cors::class,
+    App\Http\Middleware\RequestLogger::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -89,11 +88,12 @@ $app->configure('app');
 | are used to bind services into the container. Service providers are
 | totally optional, so you are not required to uncomment this line.
 |
-*/
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+*/
+// Ensure migration services are available for local/dev console operations
+if ($app->environment('local') || PHP_SAPI === 'cli') {
+    $app->register(Illuminate\Database\MigrationServiceProvider::class);
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -111,5 +111,58 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
+
+/*
+|--------------------------------------------------------------------------
+| Set up in memory database if configured
+|--------------------------------------------------------------------------
+|
+| Next we will include the routes file so that they can all be added to
+| the application. This will provide all of the URLs the application
+| can respond to, as well as the controllers that may handle them.
+|
+*/
+
+// Skip automatic bootstrap migrations while running artisan to avoid recursion
+$isArtisan = isset($_SERVER['argv']) && is_array($_SERVER['argv']) && in_array('artisan', $_SERVER['argv']);
+
+// If using a file-backed sqlite DB, optionally recreate it on boot when flag is set
+if (env('DB_CONNECTION') === 'sqlite' && env('DB_DATABASE') !== ':memory:' && $app->environment('local') && ! $isArtisan) {
+
+    $dbRel = env('DB_DATABASE', 'database/database.sqlite');
+    $dbPath = base_path($dbRel);
+    $needMigrate = false;
+
+    // If DB_RECREATE_ON_BOOT is set true, delete and recreate the file
+    if (filter_var(env('DB_RECREATE_ON_BOOT', false), FILTER_VALIDATE_BOOLEAN) || !file_exists($dbPath)) {
+        @mkdir(dirname($dbPath), 0755, true);
+        if (file_exists($dbPath)) {
+            @unlink($dbPath);
+        }
+        @touch($dbPath);
+        $needMigrate = true;
+    }
+
+    // Ensure runtime config points to the absolute path
+    $app['config']->set('database.connections.sqlite.database', $dbPath);
+
+    // If file was just created (or recreated), run migrations
+    if (file_exists($dbPath) && $needMigrate) {
+        try {
+            $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+            try {
+                $kernel->call('migrate:install');
+            } catch (\Throwable $e) {
+                error_log('migrate:install failed: ' . $e->getMessage());
+            }
+            $kernel->call('migrate', ['--force' => true, '--path' => 'database/migrations']);
+            if (file_exists(database_path('seeders/DatabaseSeeder.php'))) {
+                $kernel->call('db:seed', ['--force' => true]);
+            }
+        } catch (\Throwable $e) {
+            error_log('Bootstrap file DB migrate failed: ' . $e->getMessage());
+        }
+    }
+}
 
 return $app;
