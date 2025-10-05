@@ -19,10 +19,6 @@ return new class extends Migration
             // Date of the shift (e.g., 2025-09-15)
             $table->date('date');
             
-            $table->foreignId('schedule_id')
-                  ->constrained('schedules')
-                  ->onDelete('cascade');
-                  
             // Shift start and end times
             $table->time('start_time'); 
             $table->time('end_time');   
