@@ -34,10 +34,10 @@ $router->group(['middleware' => App\Http\Middleware\RequestLogger::class, 'prefi
         $router->post('/', 'StaffController@store');  // Create staff
 
         $router->group(['prefix' => '{id}'], function () use ($router) {
-            $router->get('/{id}', 'StaffController@show');
-            $router->put('/{id}', 'StaffController@update'); // Update staff
-            $router->delete('/{id}', 'StaffController@destroy');
-            $router->put('/{id}/terminate', 'StaffController@terminate');
+            $router->get('/', 'StaffController@show');
+            $router->put('/', 'StaffController@update'); // Update staff
+            $router->delete('/', 'StaffController@destroy');
+            $router->put('/terminate', 'StaffController@terminate');
         });
     });
 

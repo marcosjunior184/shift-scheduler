@@ -76,13 +76,37 @@ class ScheduleController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // NOTE: allow start_time to be later than end time to accomodate overnight shifts
+        // e.g., start_time = 22:00, end_time = 06:
         $validator = Validator::make($request->all(), [
-            'date' => 'required|date',
+            'date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            'end_time' => 'required|date_format:H:i',
             'employee_id' => 'required|exists:staff,id',
             'assigned_role' => 'nullable|exists:roles,id'
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            if (!$validator->errors()->any() && $request->has(['start_time', 'end_time', 'date'])) {
+                $start = Carbon::parse($request->start_time);
+                $end = Carbon::parse($request->end_time);
+                
+                // Handle overnight shifts (if end time is before start time, it's next day)
+                if ($end->lt($start)) {
+                    $end->addDay();
+                }
+                
+                $durationInHours = $end->diffInHours($start);
+                
+                if ($durationInHours > Schedule::MAX_SHIFT_DURATION_HOURS) {
+                    $validator->errors()->add(
+                        'end_time', 
+                        'Shift duration cannot exceed '.Schedule::MAX_SHIFT_DURATION_HOURS.' hours.'
+                    );
+                }
+            }
+        });
+
 
         if ($validator->fails()) {
             return response()->json([
@@ -92,19 +116,13 @@ class ScheduleController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+
         try {
             $data = $validator->validated();
-            
-            if (Schedule::where('employee_id', $data['employee_id'])->whereDate('date', $data['date'])->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Scheduling conflict: Employee already has a shift on this date'
-                ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
 
-            // Check for compflicting shifts
+            // Check for existing shift on same date for the same employee
             $conflict = Schedule::where('employee_id', $data['employee_id'])
-                ->where('date', $data['date'])
+                ->where('date', Carbon::parse($data['date'])->format('Y-m-d H:i:s'))
                 ->where(function($query) use ($data) {
                     // Check for start_time in between another shift
                     $query->whereBetween('start_time', [$data['start_time'], $data['end_time']])
@@ -117,6 +135,7 @@ class ScheduleController extends Controller
                           });
                 })
                 ->exists();
+
             
             if ($conflict) {
                 return response()->json([
@@ -130,7 +149,7 @@ class ScheduleController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Schedule created successfully',
-                'data' => $schedule->load(['employee.role', 'role'])
+                'data' => $schedule
             ], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return response()->json([
@@ -180,16 +199,48 @@ class ScheduleController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Schedule not found'
-            ], ScheduleResponse::HTTP_NOT_FOUND);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+        // NOTE: allow start_time to be later than end time to accomodate overnight shifts
+        // e.g., start_time = 22:00, end_time = 06:
         $validator = Validator::make($request->all(), [
-            'date' => 'sometimes|required|date',
-            'start_time' => 'sometimes|required|date_format:H:i',
-            'end_time' => 'sometimes|required|date_format:H:i|after:start_time',
-            'employee_id' => 'sometimes|required|exists:staff,id',
+            'date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'employee_id' => 'required|exists:staff,id',
             'assigned_role' => 'nullable|exists:roles,id'
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            
+            if (!$validator->errors()->any() && $request->has(['start_time', 'end_time', 'date'])) {
+                $start = Carbon::parse($request->start_time);
+                $end = Carbon::parse($request->end_time);
+                $date = Carbon::parse($request->date);
+
+                if ($date->isPast()) {
+                    $validator->errors()->add(
+                        'date', 
+                        'Date cannot be in the past.'
+                    );
+                }
+                
+                // Handle overnight shifts (if end time is before start time, it's next day)
+                if ($end->lt($start)) {
+                    $end->addDay();
+                }
+                
+                $durationInHours = $end->diffInHours($start);
+                
+                if ($durationInHours > Schedule::MAX_SHIFT_DURATION_HOURS) {
+                    $validator->errors()->add(
+                        'end_time', 
+                        'Shift duration cannot exceed '.Schedule::MAX_SHIFT_DURATION_HOURS.' hours.'
+                    );
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json([
@@ -260,7 +311,7 @@ class ScheduleController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Schedule not found'
-            ], ScheduleResponse::HTTP_NOT_FOUND);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {

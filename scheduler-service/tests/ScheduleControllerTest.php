@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\Staff;
 use App\Models\Schedule as Schedule;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Mockery;
 
 class ScheduleControllerTest extends TestCase
 {
@@ -365,24 +366,33 @@ class ScheduleControllerTest extends TestCase
     public function test_delete_rejects_nonexistent_schedule()
     {
         $this->delete("/api/schedules/9999") // Assuming 9999 does not exist
-            ->seeStatusCode(404)
+            ->seeStatusCode(422)
             ->seeJson(['success' => false, 'message' => 'Schedule not found']);
     }
 
     /**
      * Test delete handles exceptions gracefully and doesn't delete the entry.
+     * 
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function test_delete_rejects_on_exception()
     {
         // Mock Schedule model to throw exception on delete
-        $this->mock(\App\Models\Schedule::class, function ($mock) {
-            $mock->shouldReceive('find')->andReturnSelf();
-            $mock->shouldReceive('delete')->andThrow(new \Exception('DB error'));
-        });
+        // Create a partial mock of an existing instance
+
+        $mock= Mockery::mock('override', 'alias:\App\Models\Schedule');
+
+        $mock->shouldReceive('find')->andReturnSelf($mock);
+        $mock->shouldReceive('delete')->andThrow(new \Exception('DB error'));
+
+        $this->app->instance('App\Models\Schedule', $mock);
 
         $this->delete("/api/schedules/1") // ID doesn't matter due to mocking
             ->seeStatusCode(500)
             ->seeJson(['success' => false, 'message' => 'Failed to delete schedule']);
+
+        Mockery::close();
     }
 
 

@@ -46,7 +46,7 @@ class RoleController extends Controller
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
-            ], Response::Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -77,7 +77,7 @@ class RoleController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Role not found'
-            ], Response::HTTP_NOT_FOUND);
+            ],  Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $validator = Validator::make($request->all(), [
@@ -90,7 +90,7 @@ class RoleController extends Controller
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
-            ], Response::Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -130,7 +130,7 @@ class RoleController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Cannot delete role. It is assigned to staff members.'
-                ], Response::Response::HTTP_UNPROCESSABLE_ENTITY);
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             $role->delete();

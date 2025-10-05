@@ -14,6 +14,8 @@ class Schedule extends Model
 
     use HasFactory;
 
+    const MAX_SHIFT_DURATION_HOURS = 12;
+
     /**
      * Assignable attributes.
      *

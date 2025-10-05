@@ -106,7 +106,7 @@ class StaffController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Staff member not found'
-                ], Response::HTTP_NOT_FOUND);
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             return response()->json([
@@ -133,7 +133,7 @@ class StaffController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Staff member not found'
-            ], Response::HTTP_NOT_FOUND);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $validator = Validator::make($request->all(), [
@@ -181,7 +181,7 @@ class StaffController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Staff member not found'
-            ], Response::HTTP_NOT_FOUND);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -220,12 +220,12 @@ class StaffController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Staff member not found'
-            ], Response::HTTP_NOT_FOUND);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
             $staff->update([
-                'end_date' => now()->toDateString()
+                'end_date' => date('Y-m-d H:i:s')
             ]);
             
             return response()->json([
