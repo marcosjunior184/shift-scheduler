@@ -45,6 +45,8 @@ $router->group(['middleware' => App\Http\Middleware\RequestLogger::class, 'prefi
     $router->group(['prefix' => 'schedules'], function () use ($router) {
         $router->get('/', 'ScheduleController@index');
         $router->post('/', 'ScheduleController@store');  // Create schedule
+        $router->put('/', 'ScheduleController@updateMultiple');  // Bulk update
+        $router->delete('/', 'ScheduleController@destroyMultiple');  // Bulk delete
         
         $router->group(['prefix' => '{id}'], function () use ($router) {
             $router->put('/', 'ScheduleController@update');  // Update schedule

@@ -60,9 +60,9 @@ class Schedule extends Model
     /**
      * Scope query to only include schedules for a specific date.
      */
-    public function scopeForDate($query, Carbon $date)
+    public function scopeForDate($query, string $date)
     {
-        return $query->whereDate('date', $date->toDateString());
+        return $query->whereDate('date', $date);
     }
 
     /**
@@ -102,6 +102,16 @@ class Schedule extends Model
         $end = Carbon::parse($this->end_time);
         
         return $start->diffInHours($end);
+    }
+
+    public function getFormattedStartTimeAttribute()
+    {
+        return $this->start_time ? date('H:i', strtotime($this->start_time)) : null;
+    }
+
+    public function getFormattedEndTimeAttribute()
+    {
+        return $this->end_time ? date('H:i', strtotime($this->end_time)) : null;
     }
 
 }
