@@ -1,0 +1,56 @@
+/* Styles for Staff modal and grid */
+
+.staff-grid {
+  height: 600px;
+  width: 100%;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 2147483647; /* high z-index to safely overlay other components */
+}
+
+.modal-dialog {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 640px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.form label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form input,
+.form select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+.form button {
+  padding: 8px 12px;
+}

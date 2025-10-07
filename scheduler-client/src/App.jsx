@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import TodayOverview from './components/TodayOverviewTab'
-import StaffTab from './components/StaffTab'
+import StaffTab from './staff/Staff'
 import ScheduleTab from './components/ScheduleTab'
 
 export default function App() {
