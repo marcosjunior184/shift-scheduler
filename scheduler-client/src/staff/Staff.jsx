@@ -4,6 +4,10 @@ import { staffApi } from './Staff.api'
 import './Staff.css'
 import StaffModal from './StaffModal'
 
+/**
+ * Staff management tab.
+ * @returns
+ */
 export default function StaffTab(){
   const [staff, setStaff] = useState([])
   const [roles, setRoles] = useState([])
@@ -27,7 +31,9 @@ export default function StaffTab(){
     load();
   }, [])
 
-
+ /**
+  * Load staff and roles from the API
+  */
   const load = () => {
     setLoading(true)
     Promise.all([staffApi.getStaff(), staffApi.getRoles()])
@@ -94,7 +100,7 @@ export default function StaffTab(){
     e.preventDefault()
     setSaving(true)
     try{
-
+      
       if (isNew){
         await staffApi.createStaff({
           name: form.name,

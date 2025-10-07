@@ -1,41 +1,11 @@
-const BASE = 'http://localhost:8000';
+import { jsonFetch } from '../utils/apiUtils';
 
 const staffApi = {
-  async getStaff() {
-    const res = await fetch(`${BASE}/api/staff`);
-    return res.json();
-  },
-
-  async getRoles() {
-    const res = await fetch(`${BASE}/api/roles`);
-    return res.json();
-  },
-
-  async createStaff(payload) {
-    const res = await fetch(`${BASE}/api/staff`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    return res.json();
-  },
-
-  async updateStaff(payload, id) {
-    const res = await fetch(`${BASE}/api/staff/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    return res.json();
-  },
-
-  async deleteStaff(id) {
-    const res = await fetch(`${BASE}/api/staff/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    return res.json();
-  }
+  getStaff: () => jsonFetch('/api/staff'),
+  createStaff: (payload) => jsonFetch('/api/staff', { method: 'POST', body: JSON.stringify(payload) }),
+  updateStaff: (payload, id) => jsonFetch(`/api/staff/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteStaff: (id) => jsonFetch(`/api/staff/${id}`, { method: 'DELETE' }),
+  getRoles: () => jsonFetch('/api/roles')
 }
 
 export { staffApi };
