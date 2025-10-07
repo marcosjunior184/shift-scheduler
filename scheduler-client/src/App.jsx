@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import TodayOverview from './components/TodayOverviewTab'
+import TodayOverview from './TodayOverview/TodayOverviewTab'
 import StaffTab from './staff/Staff'
 import ScheduleTab from './Schedule/Schedule'
 
