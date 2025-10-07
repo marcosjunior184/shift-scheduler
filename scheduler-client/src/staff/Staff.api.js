@@ -18,6 +18,23 @@ const staffApi = {
       body: JSON.stringify(payload)
     });
     return res.json();
+  },
+
+  async updateStaff(payload, id) {
+    const res = await fetch(`${BASE}/api/staff/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  },
+
+  async deleteStaff(id) {
+    const res = await fetch(`${BASE}/api/staff/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return res.json();
   }
 }
 

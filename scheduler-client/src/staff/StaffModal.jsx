@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom'
 
-export default function StaffModal({ show, onClose, form, handleChange, handleSubmit, saving, roles }) {
+export default function StaffModal({ show, onClose, form, OnChange, OnSubmit, onDelete, saving, roles}) {
   if (!show) return null
 
   const handleClose = (e) => {
@@ -8,6 +8,18 @@ export default function StaffModal({ show, onClose, form, handleChange, handleSu
     {
         onClose();
     }
+  }
+
+  const handleChange = (e) => {
+    OnChange(e);
+  }
+
+  const handleSubmit = (e) => {
+      OnSubmit(e);
+  }
+
+  const handleDelete = (e) => {
+      onDelete(e);
   }
 
   return (
@@ -43,9 +55,13 @@ export default function StaffModal({ show, onClose, form, handleChange, handleSu
               {roles.map(r => <option key={r.id} value={r.id}>{r.role_name}</option>)}
             </select>
           </label>
-          
-          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-            <button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Add Staff'}</button>
+          <label>Start Date: 
+              <input name="start_date" className='form' type="date" value={form.start_date} onChange={handleChange} required/>
+          </label>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginTop: 12 }}>
+            <button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Staff'}</button>
+            <button type="button" onClick={(e) => handleDelete(e)}>Delete</button>
             <button type="button" onClick={() => onClose()}>Cancel</button>
           </div>
         </form>
