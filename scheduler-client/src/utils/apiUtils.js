@@ -1,5 +1,11 @@
 const BASE = 'http://localhost:8000'
 
+/**
+ * Fetches JSON data from a REST API endpoint.
+ * @param {*} path - The API endpoint path.
+ * @param {*} opts - Fetch options.
+ * @returns {Promise<*>} - The JSON response from the API.
+ */
 export async function jsonFetch(path, opts = {}) {
   const res = await fetch(BASE + path, {
     headers: { 'Content-Type': 'application/json' },
