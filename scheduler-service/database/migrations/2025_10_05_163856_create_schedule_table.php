@@ -43,9 +43,6 @@ return new class extends Migration
             $table->index('employee_id');
             $table->index('assigned_role');
             
-            // Prevent duplicate schedules for same employee on same date
-            // $table->unique(['employee_id', 'date']);
-            
             // Composite index for date range queries
             $table->index(['date', 'start_time']);
         });
