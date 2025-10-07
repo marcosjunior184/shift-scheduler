@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react'
+import TodayOverview from './components/TodayOverviewTab'
+import StaffTab from './components/StaffTab'
+import ScheduleTab from './components/ScheduleTab'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [tab, setTab] = useState(() => {
+    try {
+      return localStorage.getItem('activeTab') || 'today'
+    } catch (e) {
+      return 'today'
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('activeTab', tab)
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, [tab])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <header className="header">
+        <h1>Restaurant Scheduler</h1>
+        <nav>
+          <button className={tab === 'today' ? 'active' : ''} onClick={() => setTab('today')}>Today</button>
+          <button className={tab === 'staff' ? 'active' : ''} onClick={() => setTab('staff')}>Staff</button>
+          <button className={tab === 'schedules' ? 'active' : ''} onClick={() => setTab('schedules')}>Schedules</button>
+        </nav>
+      </header>
+
+      <main className="main">
+        {tab === 'today' && <TodayOverview />}
+        {tab === 'staff' && <StaffTab />}
+        {tab === 'schedules' && <ScheduleTab />}
+      </main>
+
+      <footer className="footer">Backend: http://localhost:8000</footer>
+    </div>
   )
 }
-
-export default App

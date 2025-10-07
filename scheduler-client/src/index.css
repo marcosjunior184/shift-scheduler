@@ -1,68 +1,95 @@
+
+/*
+  Global variables and base rules
+*/
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --bg: #f7f7fb;
+  --card: #fff;
+  --muted: #666;
+  --accent: #2b6cb0;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+* { box-sizing: border-box; }
 
+/* Page defaults */
 body {
+  font-family: Inter, system-ui, Arial, sans-serif;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  background: var(--bg);
+  color: #111;
+}
+
+.app {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--card);
+  border-bottom: 1px solid #e6e6f0;
 }
 
-button {
-  border-radius: 8px;
+.header h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.header nav button {
+  margin-left: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  background: transparent;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.header nav button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Main layout */
+.main {
+  padding: 16px;
+  width: 100%;
+  /* limit content width so it doesn't stretch too wide on large displays */
+  /* max-width: 1200px; */
+  box-sizing: border-box;
+  /* center direct children like .card horizontally */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.footer {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+
+@media (max-width: 1080px) {
+
+  .main { padding: 12px; width: 100%; max-width: 1080px; margin: 0 auto; }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-center;
+    width: 100%;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  .header h1 { font-size: 16px; }
+  .header nav { margin-top: 8px; }
+  .header nav button { padding: 8px 10px; }
+}
+
+@media (min-width: 1400px) {
+  .main { padding: 32px; }
+  .header h1 { font-size: 22px; }
+  .header {width: 100%;}
 }
