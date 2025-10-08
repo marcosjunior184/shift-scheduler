@@ -21,8 +21,6 @@ export const groupShiftsByRole = (shifts, roles = []) => {
     grouped[roleName].push(shift)
   })
 
-  console.log('Grouped shifts:', grouped)
-
   // Return sorted by role name for stable UI ordering
   return Object.fromEntries(
     Object.entries(grouped).sort(([a], [b]) => String(a).localeCompare(String(b)))

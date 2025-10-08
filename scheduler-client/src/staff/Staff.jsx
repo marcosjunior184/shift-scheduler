@@ -3,7 +3,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { staffApi } from './Staff.api'
 import './Staff.css'
 import StaffModal from './StaffModal'
-
+import MessageModal from '../components/MessageModal'
+import { formatError } from '../utils/madalMessageUtils'
 /**
  * Staff management tab.
  * @returns
@@ -17,12 +18,26 @@ export default function StaffTab(){
   const [saving, setSaving] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [isNew, setIsNew] = useState(true)
+  const [messageModal, setMessageModal] = useState({ open: false, message: '', type: 'error', title: '' })
 
   const columns = [
     { field: "name", headerName: "Name", minWidth: 200, flex:2},
     { field: "phone_number", headerName: "Phone Number", minWidth: 150, flex:2 },
     { field: "email", headerName: "Email", minWidth: 210, flex:2 }
   ];
+
+  /**
+   * Shows a message modal.
+   * @param {*} msg - The message to display.
+   * @param {*} opts - Options for the message modal.
+   * @returns 
+   */
+  const showMessage = (msg, opts = {}) => setMessageModal({
+     open: true, 
+     message: msg || 'An error occurred', type: opts.type || 'error', 
+     title: opts.title || '', 
+     onClose: opts.onClose
+  })
   
   /**
    * Fetch staff and roles on mount
@@ -42,7 +57,10 @@ export default function StaffTab(){
     setStaff(sRes?.data || [])
     setRoles(rRes?.data || [])
   })
-  .catch(() => {})
+  .catch((err) => {
+    console.error(err); 
+    showMessage(formatError(err), { type: 'error' }) 
+  })
   .finally(()=>setLoading(false))
 }
 
@@ -125,8 +143,8 @@ export default function StaffTab(){
       setIsNew(true)
       if (showModal) setShowModal(false)
     }catch(err){
-      console.error(err)
-      alert('Failed to save staff (see console)')
+      console.error(err); 
+      showMessage(formatError(err), { type: 'error' }) 
     }finally{setSaving(false)}
   }
 
@@ -143,8 +161,8 @@ export default function StaffTab(){
       setIsNew(true)
       if (showModal) setShowModal(false)
     }catch(err){
-      console.error(err)
-      alert('Failed to delete staff (see console)')
+      console.error(err); 
+      showMessage(formatError(err), { type: 'error' }) 
     }finally{
       setSaving(false)
     }
@@ -156,7 +174,13 @@ export default function StaffTab(){
     <section className="card">
       <h2>Staff</h2>
       {loading && <p>Loading...</p>}
-      {!loading && staff.length === 0 && <p>No staff found</p>}
+      {!loading && staff.length === 0 && 
+        <div style={{ width: '100%', marginBottom: 12 }}>
+          <p>No staff found</p>
+          <button onClick={() => handleClearForm()}>Create new staff</button>
+        </div>
+        
+      }
       {!loading && staff.length > 0 &&
       <div>
           <DataGrid
@@ -190,6 +214,18 @@ export default function StaffTab(){
       roles={roles}
       isNew={isNew}
     />
+    <MessageModal 
+      open={messageModal.open} 
+      message={messageModal.message} 
+      type={messageModal.type} 
+      title={messageModal.title} 
+      onClose={() => setMessageModal({ 
+        open: false, 
+        message: '', 
+        type: 'error', 
+        title: '' })}
+    />
+
     </section>
   )
 }

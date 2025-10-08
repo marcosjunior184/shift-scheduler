@@ -5,6 +5,7 @@ import ShiftCard from './ShiftCard'
 import './Schedule.css'
 import MessageModal from '../components/MessageModal'
 import { groupShiftsByRole } from '../utils/scheduleUtils'
+import { formatError } from '../utils/madalMessageUtils'
 
 /**
  * Schedule tab component for managing staff schedules.
@@ -57,19 +58,6 @@ export default function ScheduleTab(){
    */
   const deepClone = (v) => {
     try { return JSON.parse(JSON.stringify(v)) } catch (e) { return v }
-  }
-
-  /**
-   * Formats an error object for display.
-   * @param {*} err - The error object to format.
-   * @returns {string} - The formatted error message.
-   */
-  const formatError = (err) => {
-    if (!err) return 'Unknown error'
-    if (typeof err === 'string') return err
-    if (err.data) return typeof err.data === 'string' ? err.data : JSON.stringify(err.data)
-    if (err.message) return err.message
-    try { return JSON.stringify(err) } catch (e) { return String(err) }
   }
 
   /**
