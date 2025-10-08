@@ -15,10 +15,13 @@ Prerequisites:
 - PHP 8.x
 - Composer
 - Node.js & npm (for the frontend client in `scheduler-client`)
+- php-sqllite
 
 1. **Install PHP dependencies**
 
 	 composer install
+
+     if not present, install php-sqlite3
 
 2. **Copy or create environment - important**
 
@@ -56,6 +59,7 @@ Run the PHPUnit test suite from the `scheduler-service` folder:
 	./vendor/bin/phpunit
 
 Notes:
+- Without installing php-sqlite testing will fail. 
 - Tests use an in-memory or sqlite database via the project's testing configuration.
 - Some tests use Mockery and may require running in a separate process (`@runInSeparateProcess`) to avoid aliasing conflicts. Although annotations has been added to the unit test, so it shoudn't be a problem.
 

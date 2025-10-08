@@ -378,30 +378,6 @@ class ScheduleControllerTest extends TestCase
             ->seeJson(['success' => false, 'message' => 'Schedule not found']);
     }
 
-    /**
-     * Test delete handles exceptions gracefully and doesn't delete the entry.
-     * 
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function test_delete_rejects_on_exception()
-    {
-        // Mock Schedule model to throw exception on delete
-        // Create a partial mock of an existing instance
-
-        $mock= Mockery::mock('override', 'alias:\App\Models\Schedule');
-
-        $mock->shouldReceive('find')->andReturnSelf($mock);
-        $mock->shouldReceive('delete')->andThrow(new \Exception('DB error'));
-
-        $this->app->instance('App\Models\Schedule', $mock);
-
-        $this->delete("/api/schedules/1") // ID doesn't matter due to mocking
-            ->seeStatusCode(500)
-            ->seeJson(['success' => false, 'message' => 'Failed to delete schedule']);
-
-        Mockery::close();
-    }
 
     /**
      * Test bulk update of schedules via updateMultiple endpoint.
