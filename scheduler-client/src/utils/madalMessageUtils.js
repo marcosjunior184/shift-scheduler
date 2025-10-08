@@ -4,7 +4,7 @@
    * @returns {string} - The formatted error message.
    */
   export const formatError = (err) => {
-    console.log('formatError', err[0].data.message.errors)
+
     if (!err) return 'Unknown error'
     if (typeof err === 'string') return err
     if (Array.isArray(err)) return ( err[0].data.message || JSON.stringify(err))
